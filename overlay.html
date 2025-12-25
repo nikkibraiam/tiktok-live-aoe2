@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      background: transparent;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      color: gold;
+    }
+    #box {
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 32px;
+      text-shadow: 2px 2px 6px black;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+  </style>
+</head>
+<body>
+  <div id="box"></div>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script>
+    const box = document.getElementById("box");
+    const socket = io("http://localhost:5000");
+
+    socket.on("overlay", data => {
+      box.innerText = `⚔️ ${data.user} lidera el ejército!`;
+      box.style.opacity = 1;
+
+      setTimeout(() => {
+        box.style.opacity = 0;
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
