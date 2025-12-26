@@ -8,13 +8,13 @@
   "follow": {
     "army": {
       "action": "archery",
-      "unit": "a"
+      "unit": "r"
     }
   },
   "share": {
     "army": {
       "action": "archery",
-      "unit": "a"
+      "unit": "r"
     }
   }
 }

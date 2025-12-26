@@ -28,14 +28,13 @@ def load_VMS():
             VMS[name] = {
                 "gift_map": gift_map,
                 "rules": rules,
-                "like_buffer": 0
+                "like_buffer": {}  # ✅ DICT por usuario
             }
 
-    print(VMS)
     return VMS
 
+
 VMS = load_VMS()
-LIKE_BUFFER = 0
 
 def resolve_vm_for_gift(gift):
     for vm, data in VMS.items():
@@ -198,21 +197,29 @@ def like_event():
         if not rules:
             continue
 
-        vm_data["like_buffer"] += likes
         threshold = rules["threshold"]
 
-        spawned = vm_data["like_buffer"] // threshold
-        vm_data["like_buffer"] %= threshold
+        # 🔹 buffer POR USUARIO
+        user_buffer = vm_data["like_buffer"].get(user, 0)
+        user_buffer += likes
+
+        spawned = user_buffer // threshold
+        user_buffer %= threshold  # 👈 RESTA LOS 20 LIKES CONSUMIDOS
+
+        vm_data["like_buffer"][user] = user_buffer
+
+        print(f"[LIKE BUFFER] {vm} | {user} = {vm_data['like_buffer'][user]}")
 
         if spawned > 0:
+            # VM command
             socketio.emit("command", {
                 "action": rules["army"]["action"],
                 "unit": rules["army"]["unit"],
                 "amount": spawned
             }, room=vm)
 
+            # Overlay (consume likes correctamente)
             socketio.emit("overlay", {
-                "type": "like",
                 "vm": vm,
                 "user": user,
                 "avatar": avatar,
@@ -222,11 +229,12 @@ def like_event():
                 "amount": spawned
             })
 
-            print(f"❤️ {vm} → {spawned} unidades")
+            print(f"❤️ {vm} | {user} → {spawned} unidades")
 
-        break   # 👈 PRIMER vm QUE LO MANEJA
+        break  # 👈 primer VM que maneja likes
 
     return {"ok": True}
+
 
 @app.route("/follow", methods=["POST"])
 def follow_event():

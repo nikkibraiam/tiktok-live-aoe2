@@ -55,7 +55,7 @@ socket.on("overlay", data => {
   // --------------------
   // UNIDAD EN PANTALLA
   // --------------------
-  createUnit(vm, action, unit);
+  createUnit(vm, action, unit, user);
 
   // --------------------
   // DONOR
@@ -227,46 +227,64 @@ function renderInfoBar(vm) {
 }
 
 
-function createUnit(vm, action, unit) {
+function createUnit(vm, action, unit, user) {
   const queueContainer = document.getElementById(`queue-${vm}`);
-  
+
+  const RADIUS = 49;
+  const TOTAL_TIME = 20;
+  const totalDash = 2 * Math.PI * RADIUS;
+
   const queueUnit = document.createElement("div");
   queueUnit.className = "queue-unit";
 
   queueUnit.innerHTML = `
     <img class="unit-img ${vm}" src="overlay/units/${action}/${unit}.webp">
-    <svg width="60" height="60">
-      <circle cx="30" cy="30" r="28" stroke="white" stroke-width="4" fill="transparent" stroke-dasharray="176" stroke-dashoffset="176"></circle>
+
+    <div class="unit-user">${user}</div>
+
+    <svg width="100" height="100">
+      <circle
+        cx="50"
+        cy="50"
+        r="${RADIUS}"
+        stroke="white"
+        stroke-width="4"
+        fill="transparent"
+        stroke-dasharray="${totalDash}"
+        stroke-dashoffset="${totalDash}">
+      </circle>
     </svg>
-    <div class="countdown">20</div>
+
+    <div class="countdown">${TOTAL_TIME}</div>
   `;
 
   queueContainer.appendChild(queueUnit);
 
   const circle = queueUnit.querySelector("circle");
   const countdownEl = queueUnit.querySelector(".countdown");
-  let time = 20; // segundos
-  const totalDash = 2 * Math.PI * 28; // circunferencia círculo
+
+  let time = TOTAL_TIME;
 
   const interval = setInterval(() => {
     time -= 0.1;
+
     if (time <= 0) {
       clearInterval(interval);
       countdownEl.textContent = "0";
 
-      // Agrega la unidad a tu render principal
       const key = `${action}_${unit}`;
       unitCounters[vm][key] = (unitCounters[vm][key] || 0) + 1;
 
-      // ✅ Remueve la unidad del queue cuando termina
       queueUnit.remove();
       return;
     }
+
     countdownEl.textContent = Math.ceil(time);
-    const progress = (time / 20) * totalDash;
-    circle.style.strokeDashoffset = progress;
+    circle.style.strokeDashoffset = (time / TOTAL_TIME) * totalDash;
   }, 100);
 }
+
+
 
 function formatNumberShort(num) {
   if (num >= 1e12) return (num / 1e12).toFixed(1) + "T";

@@ -1,16 +1,16 @@
 [
   { "gift": "TikTok", "army": { "action": "barracks", "unit": "e" } },
   { "gift": "White Rose", "army": { "action": "barracks", "unit": "g" } },
-  { "gift": "Ice Cream Cone", "army": { "action": "archery", "unit": "r" } },
+  { "gift": "Ice Cream Cone", "army": { "action": "archery", "unit": "a" } },
 
-  { "gift": "Finger Heart", "army": { "action": "archery", "unit": "e" } },
+  { "gift": "Finger Heart", "army": { "action": "archery", "unit": "c" } },
   { "gift": "Heart Me", "army": { "action": "stable", "unit": "t" } },
   { "gift": "Doughnut", "army": { "action": "stable", "unit": "n" } },
 
-  { "gift": "Cap", "army": { "action": "siege", "unit": "a" } },
+  { "gift": "Cap", "army": { "action": "stable", "unit": "c" } },
   { "gift": "Mishka Bear", "army": { "action": "siege", "unit": "n" } },
 
-  { "gift": "Sunglasses", "army": { "action": "castle", "unit": "t" } },
-  { "gift": "Money Gun", "army": { "action": "castle", "unit": "r" } },
-  { "gift": "Galaxy", "army": { "action": "castle", "unit": "p" } }
+  { "gift": "Sunglasses", "army": { "action": "siege", "unit": "c" } },
+  { "gift": "Money Gun", "army": { "action": "siege", "unit": "a" } },
+  { "gift": "Galaxy", "army": { "action": "castle", "unit": "t" } }
 ]
