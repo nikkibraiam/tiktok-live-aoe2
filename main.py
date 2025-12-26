@@ -15,37 +15,37 @@ socketio = SocketIO(
 # ======================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def load_mvs():
-    mvs = {}
+def load_vms():
+    vms = {}
 
     for name in os.listdir(BASE_DIR):
-        if name.startswith("MV") and os.path.isdir(name):
+        if name.startswith("vm") and os.path.isdir(name):
             with open(f"{name}/gift_map.json", encoding="utf-8") as f:
                 gift_map = {g["gift"]: g["army"] for g in json.load(f)}
 
             with open(f"{name}/events_rules.json", encoding="utf-8") as f:
                 rules = json.load(f)
 
-            mvs[name] = {
+            vms[name] = {
                 "gift_map": gift_map,
                 "rules": rules,
                 "like_buffer": 0
             }
 
-    return mvs
+    return vms
 
-MVS = load_mvs()
+vmS = load_vms()
 LIKE_BUFFER = 0
 
-def resolve_mv_for_gift(gift):
-    for mv, data in MVS.items():
+def resolve_vm_for_gift(gift):
+    for vm, data in vmS.items():
         army = data["gift_map"].get(gift)
         if army:
-            return mv, army
+            return vm, army
     return None, None
 
-def resolve_mv_for_event(event, key=None):
-    for mv, data in MVS.items():
+def resolve_vm_for_event(event, key=None):
+    for vm, data in vmS.items():
         rules = data["rules"].get(event)
         if not rules:
             continue
@@ -54,11 +54,11 @@ def resolve_mv_for_event(event, key=None):
         if isinstance(rules, dict) and key:
             rule = rules.get(key)
             if rule:
-                return mv, rule
+                return vm, rule
 
         # Caso follow / share
         if key is None and "army" in rules:
-            return mv, rules
+            return vm, rules
 
     return None, None
 
@@ -69,14 +69,14 @@ def resolve_mv_for_event(event, key=None):
 # ======================
 @socketio.on("register")
 def register(data):
-    mv = data.strip()
+    vm = data.strip()
 
-    if mv not in MVS:
-        print(f"❌ MV inválido: {mv}")
+    if vm not in vmS:
+        print(f"❌ vm inválido: {vm}")
         return
 
-    join_room(mv)
-    print(f"🤖 Bot registrado en {mv}")
+    join_room(vm)
+    print(f"🤖 Bot registrado en {vm}")
 
 # ======================
 # TIKTOK EVENT
@@ -94,9 +94,9 @@ def gift_event():
         "amount": amount
     })
 
-    mv, army = resolve_mv_for_gift(gift)
+    vm, army = resolve_vm_for_gift(gift)
 
-    if not mv:
+    if not vm:
         print(f"⚠️⚠️ Gift sin mapping global: {gift}")
         return {"ok": True}
 
@@ -104,9 +104,9 @@ def gift_event():
         "action": army["action"],
         "unit": army["unit"],
         "amount": amount
-    }, room=mv)
+    }, room=vm)
 
-    print(f"⚔️ {mv} | {user} → {army['action']} {army['unit']} x{amount}")
+    print(f"⚔️ {vm} | {user} → {army['action']} {army['unit']} x{amount}")
     return {"ok": True}
 
 
@@ -115,18 +115,18 @@ def comment_event():
     data = request.json
     comment = data.get("message", "").lower()
 
-    mv, rule = resolve_mv_for_event("comment", comment)
+    vm, rule = resolve_vm_for_event("comment", comment)
 
-    if not mv:
+    if not vm:
         return {"ok": True}
 
     socketio.emit("command", {
         "action": rule["action"],
         "unit": rule["unit"],
         "amount": 1
-    }, room=mv)
+    }, room=vm)
 
-    print(f"💬 {mv} → {rule['action']} {rule['unit']}")
+    print(f"💬 {vm} → {rule['action']} {rule['unit']}")
     return {"ok": True}
 
 
@@ -136,59 +136,59 @@ def like_event():
     data = request.json
     likes = data.get("likes", 0)
 
-    for mv, mv_data in MVS.items():
-        rules = mv_data["rules"].get("likes")
+    for vm, vm_data in vmS.items():
+        rules = vm_data["rules"].get("likes")
         if not rules:
             continue
 
-        mv_data["like_buffer"] += likes
+        vm_data["like_buffer"] += likes
         threshold = rules["threshold"]
 
-        spawned = mv_data["like_buffer"] // threshold
-        mv_data["like_buffer"] %= threshold
+        spawned = vm_data["like_buffer"] // threshold
+        vm_data["like_buffer"] %= threshold
 
         if spawned > 0:
             socketio.emit("command", {
                 "action": rules["army"]["action"],
                 "unit": rules["army"]["unit"],
                 "amount": spawned
-            }, room=mv)
+            }, room=vm)
 
-            print(f"❤️ {mv} → {spawned} unidades")
+            print(f"❤️ {vm} → {spawned} unidades")
 
-        break   # 👈 PRIMER MV QUE LO MANEJA
+        break   # 👈 PRIMER vm QUE LO MANEJA
 
     return {"ok": True}
 
 @app.route("/follow", methods=["POST"])
 def follow_event():
-    mv, rules = resolve_mv_for_event("follow")
-    if not mv:
+    vm, rules = resolve_vm_for_event("follow")
+    if not vm:
         return {"ok": True}
 
-    emit_simple_event(mv, "follow")
-    print(f"➕ Follow → {mv}")
+    emit_simple_event(vm, "follow")
+    print(f"➕ Follow → {vm}")
     return {"ok": True}
 
 
 @app.route("/share", methods=["POST"])
 def share_event():
-    mv, rules = resolve_mv_for_event("share")
-    if not mv:
+    vm, rules = resolve_vm_for_event("share")
+    if not vm:
         return {"ok": True}
 
-    emit_simple_event(mv, "share")
-    print(f"➕ Share → {mv}")
+    emit_simple_event(vm, "share")
+    print(f"➕ Share → {vm}")
     return {"ok": True}
 
 
-def emit_simple_event(mv, event):
-    rules = MVS[mv]["rules"][event]
+def emit_simple_event(vm, event):
+    rules = vmS[vm]["rules"][event]
     socketio.emit("command", {
         "action": rules["army"]["action"],
         "unit": rules["army"]["unit"],
         "amount": 1
-    }, room=mv)
+    }, room=vm)
 
 if __name__ == "__main__":
     socketio.run(app, host="0.0.0.0", port=5000)
