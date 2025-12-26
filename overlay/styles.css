@@ -1,91 +1,214 @@
 html, body {
   margin: 0;
-  padding: 0;
   background: transparent;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  color: #fff;
+  font-family: Arial, sans-serif;
+  color: white;
 }
 
-/* SCOREBOARD */
-#scoreboard {
+h2, h3{
+    text-align: center;
+    margin: 0;
+}
+/* POWER BAR */
+#power-bar {
   position: fixed;
-  top: 30px;
-  left: 30px;
+  top: 20px;
+  left: 50%;
+  width: 600px;
+  height: 18px;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#blue-power {
+  height: 100%;
+  background: #2aa3ff;
+  width: 50%;
+  float: left;
+}
+
+#red-power {
+  height: 100%;
+  background: #ff3b3b;
+  width: 50%;
+  float: right;
+}
+
+/* TEAMS */
+#teams {
+  position: fixed;
+  top: 55px;
+  left: 0;
+  right: 0;
   display: flex;
-  gap: 40px;
+  justify-content: space-between;
+  pointer-events: none; /* opcional, OBS-friendly */
 }
 
 .team {
-  background: rgba(0,0,0,0.6);
-  border-radius: 14px;
+  background: #0000006b;
   padding: 16px;
-  width: 260px;
+  border-radius: 14px;
+  width: 300px;
+  pointer-events: auto;
 }
 
-.team.blue { border-left: 6px solid #2aa3ff; }
-.team.red  { border-left: 6px solid #ff3b3b; }
-
-.team h2 {
-  margin: 0 0 10px;
-  text-align: center;
+.team.blue { 
+    border: 2px solid #2aa3ff;
+    border-right: 15px solid #2aa3ff; 
+}
+.team.red  { 
+    border: 2px solid #ff3b3b;
+    border-left: 15px solid #ff3b3b; 
 }
 
 .units {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-
-.unit {
-  background: rgba(255,255,255,0.08);
-  border-radius: 8px;
-  padding: 6px;
-  text-align: center;
-  font-size: 12px;
-}
-
-.unit img {
-  width: 32px;
-}
-
-/* FEED */
-#feed {
-  position: fixed;
-  bottom: 40px;
-  left: 40px;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
-.event {
-  background: rgba(0,0,0,0.7);
-  border-radius: 10px;
-  padding: 10px 14px;
-  animation: slide 0.3s ease;
-}
-
-@keyframes slide {
-  from { opacity: 0; transform: translateX(-20px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-/* TOP */
-#top {
-  position: fixed;
-  top: 30px;
-  right: 30px;
-  background: rgba(0,0,0,0.6);
-  border-radius: 14px;
-  padding: 16px;
-  width: 260px;
-}
-
-#top h3 {
-  margin: 0 0 10px;
+/* UNIT CARD */
+.unit {
+  position: relative;
+  width: 64px;
   text-align: center;
 }
 
-#top-list li {
-  margin-bottom: 6px;
+.unit img {
+  width: 64px;
+  animation: spawn 0.35s ease-out;
+}
+
+/* FLOATING GIFT */
+.unit .gift {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  animation: pop 0.4s ease;
+}
+
+.count {
+  font-size: 12px;
+}
+
+/* ANIMATIONS */
+@keyframes spawn {
+  from { transform: scale(0.5); opacity: 0 }
+  to   { transform: scale(1); opacity: 1 }
+}
+
+@keyframes pop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+
+.blue-dominates .team.blue {
+  box-shadow: 0 0 20px #2aa3ff;
+  animation: shake 0.4s infinite;
+}
+
+.red-dominates .team.red {
+  box-shadow: 0 0 20px #ff3b3b;
+  animation: shake 0.4s infinite;
+}
+
+@keyframes shake {
+  0% { transform: translate(0); }
+  25% { transform: translate(2px, 0); }
+  50% { transform: translate(-2px, 0); }
+  75% { transform: translate(2px, 0); }
+}
+
+.explode {
+  animation: explode 0.4s forwards;
+}
+
+@keyframes explode {
+  to {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+#info-bar {
+  position: absolute;
+  background: #000000ba;
+  bottom: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  font-size: 12px;
+  opacity: 0.9;
+}
+.info-units {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.info-unit {
+    position: relative;
+    width: 150px;
+    height: 145px;
+    background: rgba(0,0,0,0.55);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* UNIDAD GRANDE */
+.info-unit .unit-img {
+    width: 140px;
+    height: 135px;
+    z-index: 1;
+    border-radius: 5px;
+}
+
+/* REGALO PEQUEÑO ABAJO */
+.info-unit .gift-img {
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 70px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    padding: 2px;
+    z-index: 2;
+}
+
+/* COLOR TEAM */
+.info-team.blue{
+    background: #1200ff26;
+}
+
+.info-team.red{
+    background: #ff000026;
+}
+
+.info-team.blue .info-unit {
+  box-shadow: 0 0 10px rgb(0 150 255);
+  border: 2px blue solid;
+}
+
+.info-team.red .info-unit {
+  box-shadow: 0 0 10px rgba(255,60,60);
+  border: 2px red solid;
+}
+
+#info-vm1 .info-unit .gift-img{
+    background: rgb(0 53 255 / 58%);
+}
+
+#info-vm2 .info-unit .gift-img{
+    background: rgb(255 0 0 / 58%);
 }

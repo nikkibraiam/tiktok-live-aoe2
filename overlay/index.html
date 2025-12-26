@@ -2,35 +2,53 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>AoE TikTok Battle</title>
+  <title>AoE Battle Overlay</title>
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="overlay/styles.css">
 </head>
 <body>
 
-  <!-- SCOREBOARD -->
-  <div id="scoreboard">
+  <!-- POWER BAR -->
+  <div id="power-bar">
+    <div id="blue-power"></div>
+    <div id="red-power"></div>
+  </div>
+
+  <!-- TEAMS -->
+  <div id="teams">
     <div class="team blue">
-      <h2>🔵 AZUL</h2>
+      <h2>🔵 AZUL 🔵</h2>
+      <div class="top">
+  <h3>👑 Top 👑</h3>
+  <ol class="top-list" id="top-vm1"></ol>
+</div>
       <div class="units" id="units-vm1"></div>
     </div>
 
     <div class="team red">
-      <h2>🔴 ROJO</h2>
+      <h2>🔴 ROJO 🔴</h2>
+      <div class="top">
+    <h3>👑 Top 👑</h3>
+    <ol class="top-list" id="top-vm1"></ol>
+    </div>
       <div class="units" id="units-vm2"></div>
     </div>
   </div>
 
-  <!-- DONATIONS -->
-  <div id="feed"></div>
-
-  <!-- TOP DONATORS -->
-  <div id="top">
-    <h3>👑 TOP DONADORES</h3>
-    <ol id="top-list"></ol>
+  <!-- INFO BAR -->
+<div id="info-bar">
+  <div class="info-team blue">
+    <h2>🎁 EQUIPO AZUL 🎁</h2>
+    <div class="info-units" id="info-vm1"></div>
   </div>
 
-  <script src="overlay.js"></script>
+  <div class="info-team red">
+    <h2>🎁 EQUIPO ROJO 🎁</h2>
+    <div class="info-units" id="info-vm2"></div>
+  </div>
+</div>
+
+  <script src="overlay/overlay.js"></script>
 </body>
 </html>

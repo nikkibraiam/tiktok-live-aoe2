@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_socketio import SocketIO, join_room
 import json
 import os
@@ -6,8 +6,7 @@ import os
 app = Flask(__name__)
 socketio = SocketIO(
     app,
-    cors_allowed_origins="*",
-    async_mode="threading"
+    cors_allowed_origins="*"
 )
 
 # ======================
@@ -63,7 +62,39 @@ def resolve_vm_for_event(event, key=None):
 
     return None, None
 
+@app.after_request
+def no_cache(resp):
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
 
+@app.route("/overlay")
+def overlay_index():
+    return send_from_directory(
+        os.path.join(BASE_DIR, "overlay"),
+        "index.html"
+    )
+
+
+@app.route("/overlay/<path:filename>")
+def overlay_files(filename):
+    return send_from_directory(
+        os.path.join(BASE_DIR, "overlay"),
+        filename
+    )
+
+@app.route("/vm1/<path:filename>")
+def vm1_files(filename):
+    return send_from_directory(
+        os.path.join(BASE_DIR, "vm1"),
+        filename
+    )
+
+@app.route("/vm2/<path:filename>")
+def vm2_files(filename):
+    return send_from_directory(
+        os.path.join(BASE_DIR, "vm2"),
+        filename
+    )
 
 # ======================
 # SOCKET EVENTS

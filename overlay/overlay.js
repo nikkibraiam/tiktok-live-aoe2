@@ -1,109 +1,171 @@
 const socket = io("http://localhost:5000");
 
-// --------------------
-// CONFIG
-// --------------------
-const giftToVM = {
-  // VM1 - AZUL
-  "TikTok": "vm1",
-  "White Rose": "vm1",
-  "Ice Cream Cone": "vm1",
-  "Finger Heart": "vm1",
-  "Heart Me": "vm1",
-  "Doughnut": "vm1",
-  "Cap": "vm1",
-  "Mishka Bear": "vm1",
-  "Sunglasses": "vm1",
-  "Money Gun": "vm1",
-  "Galaxy": "vm1",
-
-  // VM2 - ROJO
-  "You're awesome": "vm2",
-  "I'm Ready": "vm2",
-  "GG": "vm2",
-  "Rosa": "vm2",
-  "Perfume": "vm2",
-  "Capybara": "vm2",
-  "Hat and Mustache": "vm2",
-  "Hand Hearts": "vm2",
-  "Hearts": "vm2",
-  "Gem Gun": "vm2",
-  "Shiny air balloon": "vm2"
-};
-
-const unitCounters = {
-  vm1: {},
+const giftMaps = {};
+const unitCounters = { vm1: {}, vm2: {} };
+let power = { vm1: 0, vm2: 0 };
+const donors = {
+  vm1: {}, // user -> total
   vm2: {}
 };
 
-const donors = {}; // user -> total units
+// --------------------
+// LOAD GIFTMAPS
+// --------------------
+async function loadGiftMaps() {
+  giftMaps.vm1 = await fetch("/vm1/gift_map.json").then(r => r.json());
+  giftMaps.vm2 = await fetch("/vm2/gift_map.json").then(r => r.json());
+
+  renderInfoBar("vm1");
+  renderInfoBar("vm2");
+}
+
+loadGiftMaps();
 
 // --------------------
-// SOCKET EVENTS
+// SOCKET EVENT
 // --------------------
-socket.on("overlay", (data) => {
-  const { user, gift, amount } = data;
-  const vm = giftToVM[gift];
-  if (!vm) return;
+socket.on("overlay", data => {
+  const { gift, amount, user } = data;
 
-  // FEED
-  spawnFeed(user, gift, amount, vm);
+  const resolved = resolveGift(gift);
+  if (!resolved) return;
 
-  // UNITS
-  addUnits(vm, gift, amount);
+  const { vm, action, unit } = resolved;
 
-  // DONORS
-  donors[user] = (donors[user] || 0) + amount;
-  updateTop();
+  addUnit(vm, action, unit, gift, amount);
+  updatePower(vm, amount);
+
+donors[vm][user] = (donors[vm][user] || 0) + amount;
+  renderTop(vm);
 });
 
 // --------------------
-// UI FUNCTIONS
+// RESOLUTION
 // --------------------
-function addUnits(vm, gift, amount) {
-  const unit = gift; // simplificado visual
-  unitCounters[vm][unit] = (unitCounters[vm][unit] || 0) + amount;
-  renderUnits(vm);
+function resolveGift(giftName) {
+  for (const vm of ["vm1", "vm2"]) {
+    const entry = giftMaps[vm]?.find(g => g.gift === giftName);
+    if (entry) {
+      return {
+        vm,
+        action: entry.army.action,
+        unit: entry.army.unit
+      };
+    }
+  }
+  return null;
 }
 
-function renderUnits(vm) {
+// --------------------
+// UNIT HANDLING
+// --------------------
+function addUnit(vm, action, unit, gift, amount) {
+  const key = `${action}_${unit}`;
+  unitCounters[vm][key] = (unitCounters[vm][key] || 0) + amount;
+
+  renderUnits(vm, action, unit, gift, unitCounters[vm][key]);
+}
+
+function renderUnits(vm, action, unit, gift, count) {
   const container = document.getElementById(`units-${vm}`);
-  container.innerHTML = "";
+  let card = container.querySelector(`[data-key="${action}_${unit}"]`);
 
-  Object.entries(unitCounters[vm]).forEach(([unit, count]) => {
-    const div = document.createElement("div");
-    div.className = "unit";
-    div.innerHTML = `
-      <img src="units/${unit[0].toLowerCase()}.png">
-      <div>${count}</div>
+  if (!card) {
+    card = document.createElement("div");
+    card.className = "unit";
+    card.dataset.key = `${action}_${unit}`;
+
+    card.innerHTML = `
+      <img src="overlay/units/${action}/${unit}.webp">
+      <img class="gift" src="overlay/gifts/${gift}.webp">
+      <div class="count">x${count}</div>
     `;
-    container.appendChild(div);
-  });
+    container.appendChild(card);
+  } else {
+    card.querySelector(".count").innerText = `x${count}`;
+    card.querySelector(".gift").src = `gifts/${gift}.webp`;
+  }
 }
 
-function spawnFeed(user, gift, amount, vm) {
-  const feed = document.getElementById("feed");
-  const el = document.createElement("div");
-  el.className = "event";
-  el.innerHTML = `
-    <b>${user}</b> envió 🎁 ${gift} x${amount}
-    <br><small>${vm === "vm1" ? "🔵 AZUL" : "🔴 ROJO"}</small>
-  `;
-  feed.appendChild(el);
+// --------------------
+// POWER BAR
+// --------------------
+function updatePower(vm, amount) {
+  power[vm] += amount;
 
-  setTimeout(() => el.remove(), 4500);
+  const total = power.vm1 + power.vm2 || 1;
+  const bluePct = (power.vm1 / total) * 100;
+  const redPct  = (power.vm2 / total) * 100;
+
+  blueBar.style.width = `${bluePct}%`;
+  redBar.style.width  = `${redPct}%`;
+
+  document.body.classList.toggle("blue-dominates", bluePct > 65);
+  document.body.classList.toggle("red-dominates", redPct > 65);
 }
 
-function updateTop() {
-  const list = document.getElementById("top-list");
+function renderTop(vm) {
+  const list = document.getElementById(`top-${vm}`);
   list.innerHTML = "";
 
-  Object.entries(donors)
+  Object.entries(donors[vm])
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
-    .forEach(([user, count], i) => {
+    .forEach(([user, total], i) => {
       const li = document.createElement("li");
-      li.innerHTML = `${i === 0 ? "👑" : "⚔️"} ${user} — ${count}`;
+      li.innerHTML = `${i === 0 ? "👑" : "⚔️"} ${user} (${total})`;
       list.appendChild(li);
     });
+}
+
+
+function killRandomUnit(vm) {
+  const enemy = vm === "vm1" ? "vm2" : "vm1";
+  const keys = Object.keys(unitCounters[enemy]);
+  if (!keys.length) return;
+
+  const randomKey = keys[Math.floor(Math.random() * keys.length)];
+  unitCounters[enemy][randomKey]--;
+
+  if (unitCounters[enemy][randomKey] <= 0) {
+    delete unitCounters[enemy][randomKey];
+  }
+
+  explodeUnit(enemy, randomKey);
+  renderAllUnits(enemy);
+}
+
+function explodeUnit(vm, key) {
+  const el = document.querySelector(`#units-${vm} [data-key="${key}"]`);
+  if (!el) return;
+
+  el.classList.add("explode");
+  setTimeout(() => el.remove(), 400);
+}
+
+function renderInfoBar(vm) {
+  const container = document.getElementById(`info-${vm}`);
+  container.innerHTML = "";
+
+  giftMaps[vm].forEach(entry => {
+    const { gift, army } = entry;
+
+    const el = document.createElement("div");
+    el.className = "info-unit";
+
+    el.innerHTML = `
+      <img 
+        class="unit-img" 
+        src="overlay/units/${army.action}/${army.unit}.webp"
+        title="${army.unit}"
+      >
+      <img 
+        class="gift-img" 
+        src="overlay/gifts/${gift}.webp"
+        title="${gift}"
+      >
+    `;
+
+    container.appendChild(el);
+  });
 }
