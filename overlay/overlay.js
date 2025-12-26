@@ -25,15 +25,41 @@ loadGiftMaps();
 // SOCKET EVENT
 // --------------------
 socket.on("overlay", data => {
-  const { gift, amount, user, avatar, diamonds } = data;
+  const {
+    gift,
+    vm: directVm,
+    action: directAction,
+    unit: directUnit,
+    amount,
+    diamonds = 1,
+    user,
+    avatar
+  } = data;
 
-  const resolved = resolveGift(gift);
-  if (!resolved) return;
+  let vm, action, unit;
 
-  const { vm, action, unit } = resolved;
+  // 🎁 CASO GIFT
+  if (gift) {
+    const resolved = resolveGift(gift);
+    if (!resolved) return;
+    ({ vm, action, unit } = resolved);
+  } 
+  // 💬❤️➕ CASO COMMENT / LIKE / FOLLOW / SHARE
+  else {
+    if (!directVm || !directAction || !directUnit) return;
+    vm = directVm;
+    action = directAction;
+    unit = directUnit;
+  }
 
+  // --------------------
+  // UNIDAD EN PANTALLA
+  // --------------------
   createUnit(vm, action, unit);
 
+  // --------------------
+  // DONOR
+  // --------------------
   if (!donors[vm][user]) {
     donors[vm][user] = {
       name: user.slice(0, 20),
@@ -44,13 +70,21 @@ socket.on("overlay", data => {
   }
 
   const donor = donors[vm][user];
-  donor.total += amount * diamonds;
+  const points = amount * diamonds;
+
+  donor.total += points;
+
   const unitKey = `${action}_${unit}`;
   donor.units[unitKey] = (donor.units[unitKey] || 0) + amount;
-  updatePower(vm, amount * diamonds);
+
+  // --------------------
+  // POWER + TOP
+  // --------------------
+  updatePower(vm, points);
   renderTop(vm);
-  
 });
+
+
 
 // --------------------
 // RESOLUTION

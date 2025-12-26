@@ -155,6 +155,7 @@ def gift_event():
 @app.route("/comment", methods=["POST"])
 def comment_event():
     data = request.json
+    user = data["user"]
     comment = data.get("message", "").lower()
     avatar = data.get("avatar")
 
@@ -169,6 +170,17 @@ def comment_event():
         "amount": 1
     }, room=vm)
 
+    socketio.emit("overlay", {
+        "type": "comment",
+        "vm": vm,
+        "user": user,
+        "avatar": avatar,
+        "diamonds": 1,
+        "action": rule["action"],
+        "unit": rule["unit"],
+        "amount": 1
+    })
+
     print(f"💬 {vm} → {rule['action']} {rule['unit']}")
     return {"ok": True}
 
@@ -178,6 +190,7 @@ def comment_event():
 def like_event():
     data = request.json
     likes = data.get("likes", 0)
+    user = data["user"]
     avatar = data.get("avatar")
 
     for vm, vm_data in VMS.items():
@@ -198,6 +211,17 @@ def like_event():
                 "amount": spawned
             }, room=vm)
 
+            socketio.emit("overlay", {
+                "type": "like",
+                "vm": vm,
+                "user": user,
+                "avatar": avatar,
+                "action": rules["army"]["action"],
+                "unit": rules["army"]["unit"],
+                "diamonds": 1,
+                "amount": spawned
+            })
+
             print(f"❤️ {vm} → {spawned} unidades")
 
         break   # 👈 PRIMER vm QUE LO MANEJA
@@ -210,10 +234,24 @@ def follow_event():
 
     data = request.json
     avatar = data.get("avatar")
+    user = data.get("user")
     if not vm:
         return {"ok": True}
 
     emit_simple_event(vm, "follow")
+
+    socketio.emit("overlay", {
+        "type": "follow",
+        "vm": vm,
+        "user": user,
+        "avatar": avatar,
+        "action": rules["army"]["action"],
+        "unit": rules["army"]["unit"],
+        "diamonds":1,
+        "amount": 1
+    })
+
+
     print(f"➕ Follow → {vm}")
     return {"ok": True}
 
@@ -223,11 +261,25 @@ def share_event():
     vm, rules = resolve_vm_for_event("share")
 
     data = request.json
+    user = data.get("user")
     avatar = data.get("avatar")
+
     if not vm:
         return {"ok": True}
 
     emit_simple_event(vm, "share")
+
+    socketio.emit("overlay", {
+        "type": "share",
+        "vm": vm,
+        "user": user,
+        "avatar": avatar,
+        "action": rules["army"]["action"],
+        "unit": rules["army"]["unit"],
+        "diamonds":1,
+        "amount": 1
+    })
+
     print(f"➕ Share → {vm}")
     return {"ok": True}
 
