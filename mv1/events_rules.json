@@ -1,0 +1,15 @@
+{
+  "likes": {
+    "threshold": 20,
+    "army": {
+      "action": "barracks",
+      "unit": "g"
+    }
+  },
+  "comment":{
+    "arquero": {
+      "action": "archery",
+      "unit": "c"
+    }
+  }
+}

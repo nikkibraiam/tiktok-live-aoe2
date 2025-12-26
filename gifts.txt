@@ -1,0 +1,64 @@
+
+TikTok 1 - MV1 - barracks g
+You're awesome 1 - MV2 - barracks g
+White Rose 1 - MV1 - barracks r
+I'm Ready 1 - MV2 - barracks r
+Ice Cream Cone 1 - MV1 - archery c
+GG 1 - MV2 - archery c
+
+Finger Heart  5 - MV1 - archery a
+Rosa 10 - MV2 - archery a
+Heart Me 1 unico - MV1  - stable t
+Perfume 20 - MV2  - stable t
+Doughnut 30 - MV1  - stable c
+Capybara 30 - MV2  - stable c
+
+Cap 99 - MV1 - siege - a
+Hat and Mustache 99 - MV2 - siege - a
+Mishka Bear 100 - MV1 - siege - n
+Hand Hearts 100 - MV2 - siege - n
+
+Sunglasses 199 - MV1 - castle r
+Hearts 199 - MV2 - castle r
+
+Money Gun 500  - MV1 - castle t
+Gem Gun 500  - MV2  - castle t
+
+
+Galaxy 1000 - MV1 - castle p
+Shiny air balloon - MV2 - castle p
+
+Whale Diving 2150 - Mata a toda la caballeria
+Leon the Kitten 4888 - Mata a todos los caballos y arqueros
+Lion 29999 - Mata todo el ejercito
+
+
+UNITS = {
+    # barracks
+    "g": 'g',  # Milicia / Campeón
+    "r": 'r',  # Lancero
+    "e": 'e',  # Eagle
+    "s": 's',  # Espadachín (si aplica)
+
+    # archery
+    "c": 'c',  # Arquero
+    "a": 'a',  # Ballesta
+    "e_arch": 'e',
+    "r_arch": 'r',
+
+    # stable
+    "t": 't',  # Scout
+    "c_cav": 'c',
+    "n": 'n',
+
+    # siege
+    "r_siege": 'r',
+    "c_siege": 'c',
+    "a_siege": 'a',
+    "n_siege": 'n',
+
+    # castle
+    "r_castle": 'r',
+    "t_castle": 't',
+    "p_castle": 'p',
+}

@@ -1,0 +1,20 @@
+{
+  "comment": {
+    "soldado": {
+      "action": "barracks",
+      "unit": "g"
+    }
+  },
+  "follow": {
+    "army": {
+      "action": "archery",
+      "unit": "c"
+    }
+  },
+  "share": {
+    "army": {
+      "action": "archery",
+      "unit": "c"
+    }
+  }
+}

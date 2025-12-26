@@ -1,0 +1,16 @@
+[
+  { "gift": "You're awesome", "army": { "action": "barracks", "unit": "g" } },
+  { "gift": "I'm Ready", "army": { "action": "barracks", "unit": "r" } },
+  { "gift": "GG", "army": { "action": "archery", "unit": "c" } },
+
+  { "gift": "Rosa", "army": { "action": "archery", "unit": "a" } },
+  { "gift": "Perfume", "army": { "action": "stable", "unit": "t" } },
+  { "gift": "Capybara", "army": { "action": "stable", "unit": "c" } },
+
+  { "gift": "Hat and Mustache", "army": { "action": "siege", "unit": "a" } },
+  { "gift": "Hand Hearts", "army": { "action": "siege", "unit": "n" } },
+
+  { "gift": "Hearts", "army": { "action": "castle", "unit": "r" } },
+  { "gift": "Gem Gun", "army": { "action": "castle", "unit": "t" } },
+  { "gift": "Shiny air balloon", "army": { "action": "castle", "unit": "p" } }
+]

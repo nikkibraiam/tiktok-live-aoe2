@@ -58,7 +58,7 @@ async def on_gift(event: GiftEvent):
     gift_buffer[key]["count"] += count
     gift_buffer[key]["last_update"] = now
 
-    print(f"🎁 BUFFER {user} → {gift} (+{count}) = {gift_buffer[key]['count']}")
+    print(f"🎁 GIFT {user} → {gift} (+{count}) = {gift_buffer[key]['count']}")
 
 
 

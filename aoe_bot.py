@@ -15,30 +15,30 @@ BUILDINGS = {
 }
 
 UNITS = {
-    # Barracks
+    # barracks
     "g": 'g',  # Milicia / Campeón
     "r": 'r',  # Lancero
     "e": 'e',  # Eagle
     "s": 's',  # Espadachín (si aplica)
 
-    # Archery
+    # archery
     "c": 'c',  # Arquero
     "a": 'a',  # Ballesta
     "e_arch": 'e',
     "r_arch": 'r',
 
-    # Stable
+    # stable
     "t": 't',  # Scout
     "c_cav": 'c',
     "n": 'n',
 
-    # Siege
+    # siege
     "r_siege": 'r',
     "c_siege": 'c',
     "a_siege": 'a',
     "n_siege": 'n',
 
-    # Castle
+    # castle
     "r_castle": 'r',
     "t_castle": 't',
     "p_castle": 'p',
