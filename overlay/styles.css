@@ -20,22 +20,30 @@ ol{
   position: relative;
   height: 24px;
   background: #333;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 #blue-power, #red-power {
   position: absolute;
   top: 0;
   height: 100%;
-  transition: width 1s ease; /* <-- usar "ease", "linear", "ease-in-out" */
+  width: 0%;          /* empieza vacía */
+  transition: width 1s linear; /* animación progresiva */
+  border-radius: 4px 0 0 4px;
 }
 
-#blue-power { left: 0; background: blue; }
-#red-power { right: 0; background: red; }
+#blue-power { left: 0; background: rgba(0, 0, 255, 0.87); }
+#red-power { right: 0; background: rgba(255, 0, 0, 0.87); border-radius: 0 4px 4px 0; }
 
 .power-text {
-  font-size: 23px;
+  position: absolute;
+  bottom: -28px;
+  font-size: 20px;
   font-weight: bold;
   color: white;
+  text-shadow: 1px 1px 2px black;
+  transition: all 0.5s ease;
 }
 
 
@@ -44,14 +52,12 @@ ol{
   left: 10px;
   top: 0px;
   z-index: 11; 
-  transition: all 1s ease; 
 }
 #red-points { 
   position: absolute;
   right: 10px;
   top: 0px;
   z-index: 11;
-  transition: all 1s ease; 
 }
 
 
@@ -67,12 +73,13 @@ ol{
 }
 
 .team {
-  background: #0000006b;
-  padding: 16px;
-  border-radius: 14px;
-  width: 300px;
-  pointer-events: auto;
-}
+    background: #0000008c;
+    padding: 5px;
+    border-radius: 14px;
+    width: 330px;
+    font-size: 18px;
+    pointer-events: auto;
+}soove 
 
 .team.blue { 
     border: 2px solid #2aa3ff;
@@ -196,6 +203,7 @@ ol{
 .top-player .total {
   font-weight: bold;
   text-align: right;
+  text-align: center;
 }
 
 .rank{
@@ -203,17 +211,23 @@ ol{
   height: 35px;
 }
 
+#bottom-overlay {
+  position: fixed;
+  bottom: 0px;
+}
 
+
+/* INFO BAR */
 #info-bar {
-  position: absolute;
-  background: #000000ba;
-  bottom: 10px;
-  width: 100%;
+  background: rgba(0,0,0,0.48);
   display: flex;
   justify-content: space-around;
   font-size: 12px;
-  opacity: 0.9;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
+
 .info-units {
   display: flex;
   flex-wrap: wrap;
@@ -224,8 +238,8 @@ ol{
 
 .info-unit {
     position: relative;
-    width: 150px;
-    height: 145px;
+    width: 145px;
+    height: 140px;
     background: rgba(0,0,0,0.55);
     border-radius: 12px;
     display: flex;
@@ -281,3 +295,63 @@ ol{
 #info-vm2 .info-unit .gift-img{
     background: rgb(255 0 0 / 58%);
 }
+
+/* UNIT QUEUE encima de info-bar */
+#unit-queue {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  opacity: 0.6;
+}
+
+.queue-container {
+  display: flex;
+  gap: 10px;
+}
+
+.queue-unit {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  margin: 5px;
+}
+
+.queue-unit img.unit-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  
+  border: 2px solid #fff;
+  object-fit: cover;
+}
+
+.queue-unit img.unit-img.vm1 {
+box-shadow: 0 0 20px blue;
+}
+
+.queue-unit img.unit-img.vm2 {
+box-shadow: 0 0 20px red;
+}
+
+/* Círculo de progreso */
+.queue-unit svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: rotate(-90deg);
+}
+
+/* Cuenta regresiva */
+.queue-unit .countdown {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+  text-shadow: 0 0 3px black;
+}
+

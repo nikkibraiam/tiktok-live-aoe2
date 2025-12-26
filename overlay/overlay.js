@@ -32,6 +32,8 @@ socket.on("overlay", data => {
 
   const { vm, action, unit } = resolved;
 
+  createUnit(vm, action, unit);
+
   if (!donors[vm][user]) {
     donors[vm][user] = {
       name: user.slice(0, 20),
@@ -82,14 +84,32 @@ function updatePower(vm, amount) {
   const bluePoints = document.getElementById("blue-points");
   const redPoints  = document.getElementById("red-points");
 
-  blueBar.style.width = `${bluePct}%`;
-  redBar.style.width  = `${redPct}%`;
+  animateBar(blueBar, bluePct);
+  animateBar(redBar, redPct);
 
   bluePoints.textContent = power.vm1 + " PTS";
   redPoints.textContent  = power.vm2 + " PTS";
 
   document.body.classList.toggle("blue-dominates", bluePct > 65);
   document.body.classList.toggle("red-dominates", redPct > 65);
+}
+
+// Función para animar progresivamente
+function animateBar(bar, targetPct) {
+  let current = parseFloat(bar.style.width) || 0;
+  const step = (targetPct - current) / 20; // divide en 20 pasos
+  let i = 0;
+
+  const interval = setInterval(() => {
+    if (i >= 20) {
+      bar.style.width = `${targetPct}%`;
+      clearInterval(interval);
+      return;
+    }
+    current += step;
+    bar.style.width = `${current}%`;
+    i++;
+  }, 25); // cada 25ms → ~0.5s total
 }
 
 
@@ -136,30 +156,6 @@ function renderTop(vm) {
 }
 
 
-function killRandomUnit(vm) {
-  const enemy = vm === "vm1" ? "vm2" : "vm1";
-  const keys = Object.keys(unitCounters[enemy]);
-  if (!keys.length) return;
-
-  const randomKey = keys[Math.floor(Math.random() * keys.length)];
-  unitCounters[enemy][randomKey]--;
-
-  if (unitCounters[enemy][randomKey] <= 0) {
-    delete unitCounters[enemy][randomKey];
-  }
-
-  explodeUnit(enemy, randomKey);
-  renderAllUnits(enemy);
-}
-
-function explodeUnit(vm, key) {
-  const el = document.querySelector(`#units-${vm} [data-key="${key}"]`);
-  if (!el) return;
-
-  el.classList.add("explode");
-  setTimeout(() => el.remove(), 400);
-}
-
 function renderInfoBar(vm) {
   const container = document.getElementById(`info-${vm}`);
   container.innerHTML = "";
@@ -172,7 +168,7 @@ function renderInfoBar(vm) {
 
     el.innerHTML = `
       <img 
-        class="unit-img" 
+        class="unit-img ${vm}" 
         src="overlay/units/${army.action}/${army.unit}.webp"
         title="${army.unit}"
       >
@@ -185,4 +181,46 @@ function renderInfoBar(vm) {
 
     container.appendChild(el);
   });
+}
+
+
+function createUnit(vm, action, unit) {
+  const queueContainer = document.getElementById(`queue-${vm}`);
+  
+  const queueUnit = document.createElement("div");
+  queueUnit.className = "queue-unit";
+
+  queueUnit.innerHTML = `
+    <img class="unit-img ${vm}" src="overlay/units/${action}/${unit}.webp">
+    <svg width="60" height="60">
+      <circle cx="30" cy="30" r="28" stroke="white" stroke-width="4" fill="transparent" stroke-dasharray="176" stroke-dashoffset="176"></circle>
+    </svg>
+    <div class="countdown">20</div>
+  `;
+
+  queueContainer.appendChild(queueUnit);
+
+  const circle = queueUnit.querySelector("circle");
+  const countdownEl = queueUnit.querySelector(".countdown");
+  let time = 20; // segundos
+  const totalDash = 2 * Math.PI * 28; // circunferencia círculo
+
+  const interval = setInterval(() => {
+    time -= 0.1;
+    if (time <= 0) {
+      clearInterval(interval);
+      countdownEl.textContent = "0";
+
+      // Agrega la unidad a tu render principal
+      const key = `${action}_${unit}`;
+      unitCounters[vm][key] = (unitCounters[vm][key] || 0) + 1;
+
+      // ✅ Remueve la unidad del queue cuando termina
+      queueUnit.remove();
+      return;
+    }
+    countdownEl.textContent = Math.ceil(time);
+    const progress = (time / 20) * totalDash;
+    circle.style.strokeDashoffset = progress;
+  }, 100);
 }
