@@ -8,6 +8,7 @@ html, body {
 h2, h3{
     text-align: center;
     margin: 0;
+    font-size: 28px;
 }
 
 ol{
@@ -80,7 +81,6 @@ ol{
     font-size: 18px;
     pointer-events: auto;
     margin: 5px;
-    max-height: 260px;
 }
 
 .team.blue { 
@@ -176,6 +176,8 @@ ol{
     gap: 2px;
     padding: 2px;
     font-size: 25px;
+    margin-top: 5px;
+
 }
 
 .top-player .avatar {

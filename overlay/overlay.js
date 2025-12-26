@@ -136,9 +136,21 @@ function renderTop(vm) {
       //     `;
       //   })
       //   .join("");
+      let rank = "👑";
+      if (i == 0){
+        rank = "👑";
+      }else if (i == 1){
+        rank = "🥈";
+      }
+      else if (i == 2){
+        rank = "🥉";
+      }
+      else{
+        rank = "‼️";
+      }
 
       li.innerHTML = `
-        <div class="rank">${i === 0 ? "👑" : i + 1}</div>
+        <div class="rank">${rank}</div>
 
         <img class="avatar" src="${donor.avatar}">
 
