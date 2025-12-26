@@ -33,7 +33,7 @@ def register(data):
 # ======================
 # TIKTOK EVENT
 # ======================
-@app.route("/event", methods=["POST"])
+@app.route("/gift", methods=["POST"])
 def event():
     data = request.json
 
@@ -67,6 +67,28 @@ def event():
     print(f"⚔️ {user} → {army['action']} {army['unit']} x{amount}")
 
     return {"ok": True}
+
+@app.route("/comment", methods=["POST"])
+def comment_event():
+    global EVENT_RULES
+
+    rules = EVENT_RULES["comment"]
+
+    data = request.json
+    comment: str = data.get("message", "")
+
+    rule = rules.get(comment.lower())
+    if rule:
+        socketio.emit("command", {
+            "action": rule["action"],
+            "unit": rule["unit"],
+            "amount": 1
+        })
+
+        print(f"💬 Comment → {rule['action']} {rule['unit']}")
+
+    return {"ok": True}
+
 
 @app.route("/like", methods=["POST"])
 def like_event():
@@ -106,6 +128,19 @@ def follow_event():
 
     print("➕ Nuevo follow → unidad siege")
 
+    return {"ok": True}
+
+@app.route("/share", methods=["POST"])
+def share_event():
+    rules = EVENT_RULES["share"]
+
+    socketio.emit("command", {
+        "action": rules["army"]["action"],
+        "unit": rules["army"]["unit"],
+        "amount": 1
+    })
+
+    print(f"➕ Nuevo share → unidad {rules['army']['action']}")
     return {"ok": True}
 
 

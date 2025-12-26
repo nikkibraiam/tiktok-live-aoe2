@@ -15,17 +15,17 @@
   "share": {
     "army": {
       "action": "stable",
-      "unit": "k"
+      "unit": "n"
     }
   },
   "comment": {
-    "!attack": {
+    "attack": {
       "action": "archery",
       "unit": "a"
     },
-    "!defend": {
+    "defend": {
       "action": "barracks",
-      "unit": "p"
+      "unit": "s"
     }
   }
 }
