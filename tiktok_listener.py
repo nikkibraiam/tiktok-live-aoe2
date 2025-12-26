@@ -4,7 +4,7 @@ import httpx
 import asyncio
 import time
 
-TIKTOK_USER = "caro_rivera.12"
+TIKTOK_USER = "sarait20_"
 MAIN_API = "http://localhost:5000/"
 DEBOUNCE_SECONDS = 0.5
 
@@ -42,6 +42,8 @@ async def on_gift(event: GiftEvent):
     user_id = event.user.unique_id
     gift = event.gift.name
     count = event.repeat_count or 1
+    avatar = event.user.avatar_url
+    gift_value = event.gift.diamond_count
 
     key = (user_id, gift)
     now = time.time()
@@ -52,6 +54,8 @@ async def on_gift(event: GiftEvent):
             "user_id": user_id,
             "gift": gift,
             "count": 0,
+            "avatar": avatar,
+            "diamonds": gift_value,
             "last_update": now
         }
 
@@ -67,11 +71,13 @@ async def on_like(event: LikeEvent):
     user_id = event.user.unique_id
     user = event.user.nickname
     count = event.count  # likes enviados en ese evento
+    avatar = event.user.avatar_url
 
     if user_id not in like_buffer:
         like_buffer[user_id] = {
             "user": user,
             "count": 0,
+            "avatar": avatar,
             "last_update": time.time()
         }
 
@@ -83,29 +89,39 @@ async def on_like(event: LikeEvent):
 @client.on(FollowEvent)
 async def on_follow(event: FollowEvent):
     print(f"➕ FOLLOW {event.user.nickname}")
+    avatar = event.user.avatar_url
 
     await httpx.AsyncClient().post(MAIN_API + "follow", json={
         "user": event.user.nickname,
-        "user_id": event.user.unique_id
+        "user_id": event.user.unique_id,
+        "avatar": avatar,
+         "diamonds": 3
     })
 
 @client.on(ShareEvent)
 async def on_share(event: ShareEvent):
     print(f"🔁 SHARE {event.user.nickname}")
 
+    avatar = event.user.avatar_url
+
     await httpx.AsyncClient().post(MAIN_API + "share", json={
         "user": event.user.nickname,
-        "user_id": event.user.unique_id
+        "user_id": event.user.unique_id,
+        "avatar": avatar,
+         "diamonds": 3
     })
 
 @client.on(CommentEvent)
 async def on_comment(event: CommentEvent):
     print(f"💬 {event.user.nickname}: {event.comment}")
+    avatar = event.user.avatar_url
 
     await httpx.AsyncClient().post(MAIN_API + "comment", json={
         "user": event.user.nickname,
         "user_id": event.user.unique_id,
-        "message": event.comment
+        "message": event.comment,
+        "avatar": avatar,
+         "diamonds": 1
     })
 
 
@@ -135,7 +151,9 @@ async def process_gifts(http, to_send):
             "user": data["user"],
             "user_id": data["user_id"],
             "gift": data["gift"],
-            "amount": data["count"]
+            "amount": data["count"],
+            "avatar": data["avatar"],
+            "diamonds": data.get("diamonds", 0)
         })
         del gift_buffer[key]
 
@@ -144,7 +162,9 @@ async def process_likes(http, to_send):
         await http.post(MAIN_API + "like", json={
             "user": data["user"],
             "user_id": key,
-            "likes": data["count"]
+            "likes": data["count"],
+            "avatar": data["avatar"],
+            "diamonds": 1
         })
         del like_buffer[key]
 

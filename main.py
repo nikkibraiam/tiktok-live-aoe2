@@ -125,11 +125,15 @@ def gift_event():
     user = data["user"]
     gift = data["gift"]
     amount = data.get("amount", 1)
+    avatar = data.get("avatar")
+    diamonds = data.get("diamonds")
 
     socketio.emit("overlay", {
         "user": user,
         "gift": gift,
-        "amount": amount
+        "amount": amount,
+        "avatar": avatar,
+        "diamonds": diamonds,
     })
 
     vm, army = resolve_vm_for_gift(gift)
@@ -152,6 +156,7 @@ def gift_event():
 def comment_event():
     data = request.json
     comment = data.get("message", "").lower()
+    avatar = data.get("avatar")
 
     vm, rule = resolve_vm_for_event("comment", comment)
 
@@ -173,6 +178,7 @@ def comment_event():
 def like_event():
     data = request.json
     likes = data.get("likes", 0)
+    avatar = data.get("avatar")
 
     for vm, vm_data in VMS.items():
         rules = vm_data["rules"].get("likes")
@@ -201,6 +207,9 @@ def like_event():
 @app.route("/follow", methods=["POST"])
 def follow_event():
     vm, rules = resolve_vm_for_event("follow")
+
+    data = request.json
+    avatar = data.get("avatar")
     if not vm:
         return {"ok": True}
 
@@ -212,6 +221,9 @@ def follow_event():
 @app.route("/share", methods=["POST"])
 def share_event():
     vm, rules = resolve_vm_for_event("share")
+
+    data = request.json
+    avatar = data.get("avatar")
     if not vm:
         return {"ok": True}
 

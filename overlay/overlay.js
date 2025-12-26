@@ -25,18 +25,29 @@ loadGiftMaps();
 // SOCKET EVENT
 // --------------------
 socket.on("overlay", data => {
-  const { gift, amount, user } = data;
+  const { gift, amount, user, avatar, diamonds } = data;
 
   const resolved = resolveGift(gift);
   if (!resolved) return;
 
   const { vm, action, unit } = resolved;
 
-  addUnit(vm, action, unit, gift, amount);
-  updatePower(vm, amount);
+  if (!donors[vm][user]) {
+    donors[vm][user] = {
+      name: user.slice(0, 20),
+      avatar: avatar || "overlay/default_avatar.png",
+      total: 0,
+      units: {}
+    };
+  }
 
-donors[vm][user] = (donors[vm][user] || 0) + amount;
+  const donor = donors[vm][user];
+  donor.total += amount * diamonds;
+  const unitKey = `${action}_${unit}`;
+  donor.units[unitKey] = (donor.units[unitKey] || 0) + amount;
+  updatePower(vm, amount * diamonds);
   renderTop(vm);
+  
 });
 
 // --------------------
@@ -57,37 +68,6 @@ function resolveGift(giftName) {
 }
 
 // --------------------
-// UNIT HANDLING
-// --------------------
-function addUnit(vm, action, unit, gift, amount) {
-  const key = `${action}_${unit}`;
-  unitCounters[vm][key] = (unitCounters[vm][key] || 0) + amount;
-
-  renderUnits(vm, action, unit, gift, unitCounters[vm][key]);
-}
-
-function renderUnits(vm, action, unit, gift, count) {
-  const container = document.getElementById(`units-${vm}`);
-  let card = container.querySelector(`[data-key="${action}_${unit}"]`);
-
-  if (!card) {
-    card = document.createElement("div");
-    card.className = "unit";
-    card.dataset.key = `${action}_${unit}`;
-
-    card.innerHTML = `
-      <img src="overlay/units/${action}/${unit}.webp">
-      <img class="gift" src="overlay/gifts/${gift}.webp">
-      <div class="count">x${count}</div>
-    `;
-    container.appendChild(card);
-  } else {
-    card.querySelector(".count").innerText = `x${count}`;
-    card.querySelector(".gift").src = `gifts/${gift}.webp`;
-  }
-}
-
-// --------------------
 // POWER BAR
 // --------------------
 function updatePower(vm, amount) {
@@ -97,23 +77,60 @@ function updatePower(vm, amount) {
   const bluePct = (power.vm1 / total) * 100;
   const redPct  = (power.vm2 / total) * 100;
 
+  const blueBar = document.getElementById("blue-power");
+  const redBar  = document.getElementById("red-power");
+  const bluePoints = document.getElementById("blue-points");
+  const redPoints  = document.getElementById("red-points");
+
   blueBar.style.width = `${bluePct}%`;
   redBar.style.width  = `${redPct}%`;
+
+  bluePoints.textContent = power.vm1 + " PTS";
+  redPoints.textContent  = power.vm2 + " PTS";
 
   document.body.classList.toggle("blue-dominates", bluePct > 65);
   document.body.classList.toggle("red-dominates", redPct > 65);
 }
 
+
 function renderTop(vm) {
   const list = document.getElementById(`top-${vm}`);
   list.innerHTML = "";
 
-  Object.entries(donors[vm])
-    .sort((a, b) => b[1] - a[1])
+  Object.values(donors[vm])
+    .sort((a, b) => b.total - a.total)
     .slice(0, 5)
-    .forEach(([user, total], i) => {
+    .forEach((donor, i) => {
       const li = document.createElement("li");
-      li.innerHTML = `${i === 0 ? "👑" : "⚔️"} ${user} (${total})`;
+      li.className = "top-player";
+
+      const unitsHtml = Object.entries(donor.units)
+        .map(([key, count]) => {
+          const [action, unit] = key.split("_");
+          return `
+            <img 
+              class="unit-mini" 
+              src="overlay/units/${action}/${unit}.webp" 
+              title="${unit} x${count}"
+            >
+          `;
+        })
+        .join("");
+
+      li.innerHTML = `
+        <div class="rank">${i === 0 ? "👑" : i + 1}</div>
+
+        <img class="avatar" src="${donor.avatar}">
+
+        <div class="name">${donor.name}</div>
+
+        <div class="units">
+          ${unitsHtml}
+        </div>
+
+        <div class="total">${donor.total} pts</div>
+      `;
+
       list.appendChild(li);
     });
 }

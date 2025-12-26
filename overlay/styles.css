@@ -9,32 +9,51 @@ h2, h3{
     text-align: center;
     margin: 0;
 }
+
+ol{
+  margin: 0;
+    padding: 0;
+}
+
 /* POWER BAR */
 #power-bar {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  width: 600px;
-  height: 18px;
-  transform: translateX(-50%);
-  background: rgba(255,255,255,0.15);
-  border-radius: 10px;
-  overflow: hidden;
+  position: relative;
+  height: 24px;
+  background: #333;
 }
 
-#blue-power {
+#blue-power, #red-power {
+  position: absolute;
+  top: 0;
   height: 100%;
-  background: #2aa3ff;
-  width: 50%;
-  float: left;
+  transition: width 1s ease; /* <-- usar "ease", "linear", "ease-in-out" */
 }
 
-#red-power {
-  height: 100%;
-  background: #ff3b3b;
-  width: 50%;
-  float: right;
+#blue-power { left: 0; background: blue; }
+#red-power { right: 0; background: red; }
+
+.power-text {
+  font-size: 23px;
+  font-weight: bold;
+  color: white;
 }
+
+
+#blue-points {   
+  position: absolute;
+  left: 10px;
+  top: 0px;
+  z-index: 11; 
+  transition: all 1s ease; 
+}
+#red-points { 
+  position: absolute;
+  right: 10px;
+  top: 0px;
+  z-index: 11;
+  transition: all 1s ease; 
+}
+
 
 /* TEAMS */
 #teams {
@@ -68,6 +87,12 @@ h2, h3{
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  min-width: 85px;
+}
+
+.top-player.pending{
+    grid-template-columns: auto;
+    text-align: center;
 }
 
 /* UNIT CARD */
@@ -109,12 +134,12 @@ h2, h3{
 
 .blue-dominates .team.blue {
   box-shadow: 0 0 20px #2aa3ff;
-  animation: shake 0.4s infinite;
+  animation: shake 0.4s normal;
 }
 
 .red-dominates .team.red {
   box-shadow: 0 0 20px #ff3b3b;
-  animation: shake 0.4s infinite;
+  animation: shake 0.5s normal;
 }
 
 @keyframes shake {
@@ -134,6 +159,50 @@ h2, h3{
     opacity: 0;
   }
 }
+
+.top-player {
+  display: grid;
+  grid-template-columns: 24px 36px 1fr auto 40px;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+.top-player .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.top-player .name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 95px;
+  min-width: 76px;
+}
+
+.top-player .units {
+  display: flex;
+  gap: 2px;
+}
+
+.unit-mini {
+  width: 20px;
+  height: 20px;
+}
+
+.top-player .total {
+  font-weight: bold;
+  text-align: right;
+}
+
+.rank{
+  font-size: 20px;
+  height: 35px;
+}
+
 
 #info-bar {
   position: absolute;
