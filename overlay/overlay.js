@@ -87,8 +87,8 @@ function updatePower(vm, amount) {
   animateBar(blueBar, bluePct);
   animateBar(redBar, redPct);
 
-  bluePoints.textContent = power.vm1 + " PTS";
-  redPoints.textContent  = power.vm2 + " PTS";
+  bluePoints.textContent = power.vm1.toLocaleString('es-CO') + " PTS";
+  redPoints.textContent  = power.vm2.toLocaleString('es-CO') + " PTS";
 
   document.body.classList.toggle("blue-dominates", bluePct > 65);
   document.body.classList.toggle("red-dominates", redPct > 65);
@@ -124,18 +124,18 @@ function renderTop(vm) {
       const li = document.createElement("li");
       li.className = "top-player";
 
-      const unitsHtml = Object.entries(donor.units)
-        .map(([key, count]) => {
-          const [action, unit] = key.split("_");
-          return `
-            <img 
-              class="unit-mini" 
-              src="overlay/units/${action}/${unit}.webp" 
-              title="${unit} x${count}"
-            >
-          `;
-        })
-        .join("");
+      // const unitsHtml = Object.entries(donor.units)
+      //   .map(([key, count]) => {
+      //     const [action, unit] = key.split("_");
+      //     return `
+      //       <img 
+      //         class="unit-mini" 
+      //         src="overlay/units/${action}/${unit}.webp" 
+      //         title="${unit} x${count}"
+      //       >
+      //     `;
+      //   })
+      //   .join("");
 
       li.innerHTML = `
         <div class="rank">${i === 0 ? "👑" : i + 1}</div>
@@ -144,11 +144,8 @@ function renderTop(vm) {
 
         <div class="name">${donor.name}</div>
 
-        <div class="units">
-          ${unitsHtml}
-        </div>
+        <div class="total">${formatNumberShort(donor.total)} pts</div>
 
-        <div class="total">${donor.total} pts</div>
       `;
 
       list.appendChild(li);
@@ -223,4 +220,12 @@ function createUnit(vm, action, unit) {
     const progress = (time / 20) * totalDash;
     circle.style.strokeDashoffset = progress;
   }, 100);
+}
+
+function formatNumberShort(num) {
+  if (num >= 1e12) return (num / 1e12).toFixed(1) + "T";
+  if (num >= 1e9)  return (num / 1e9).toFixed(1) + "G";
+  if (num >= 1e6)  return (num / 1e6).toFixed(1) + "M";
+  if (num >= 1e3)  return (num / 1e3).toFixed(1) + "K";
+  return num.toString();
 }

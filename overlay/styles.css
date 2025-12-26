@@ -64,7 +64,7 @@ ol{
 /* TEAMS */
 #teams {
   position: fixed;
-  top: 55px;
+  top: 25px;
   left: 0;
   right: 0;
   display: flex;
@@ -79,7 +79,9 @@ ol{
     width: 330px;
     font-size: 18px;
     pointer-events: auto;
-}soove 
+    margin: 5px;
+    max-height: 260px;
+}
 
 .team.blue { 
     border: 2px solid #2aa3ff;
@@ -168,17 +170,17 @@ ol{
 }
 
 .top-player {
-  display: grid;
-  grid-template-columns: 24px 36px 1fr auto 40px;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 6px;
-  font-size: 12px;
+    display: grid;
+    grid-template-columns: 45px 52px 1fr 75px;
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    font-size: 25px;
 }
 
 .top-player .avatar {
-  width: 32px;
-  height: 32px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
 }
 
@@ -186,8 +188,7 @@ ol{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 95px;
-  min-width: 76px;
+  font-size: 28px;
 }
 
 .top-player .units {
@@ -207,8 +208,8 @@ ol{
 }
 
 .rank{
-  font-size: 20px;
-  height: 35px;
+  font-size: 35px;
+  height: 50px;
 }
 
 #bottom-overlay {
