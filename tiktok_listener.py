@@ -4,7 +4,7 @@ import httpx
 import asyncio
 import time
 
-TIKTOK_USER = "yenn_._3"
+TIKTOK_USER = "caro_rivera.12"
 MAIN_API = "http://localhost:5000/"
 DEBOUNCE_SECONDS = 0.5
 

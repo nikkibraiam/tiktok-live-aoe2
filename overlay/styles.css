@@ -1,0 +1,91 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #fff;
+}
+
+/* SCOREBOARD */
+#scoreboard {
+  position: fixed;
+  top: 30px;
+  left: 30px;
+  display: flex;
+  gap: 40px;
+}
+
+.team {
+  background: rgba(0,0,0,0.6);
+  border-radius: 14px;
+  padding: 16px;
+  width: 260px;
+}
+
+.team.blue { border-left: 6px solid #2aa3ff; }
+.team.red  { border-left: 6px solid #ff3b3b; }
+
+.team h2 {
+  margin: 0 0 10px;
+  text-align: center;
+}
+
+.units {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.unit {
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 6px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.unit img {
+  width: 32px;
+}
+
+/* FEED */
+#feed {
+  position: fixed;
+  bottom: 40px;
+  left: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.event {
+  background: rgba(0,0,0,0.7);
+  border-radius: 10px;
+  padding: 10px 14px;
+  animation: slide 0.3s ease;
+}
+
+@keyframes slide {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* TOP */
+#top {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 14px;
+  padding: 16px;
+  width: 260px;
+}
+
+#top h3 {
+  margin: 0 0 10px;
+  text-align: center;
+}
+
+#top-list li {
+  margin-bottom: 6px;
+}

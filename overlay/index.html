@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>AoE TikTok Battle</title>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- SCOREBOARD -->
+  <div id="scoreboard">
+    <div class="team blue">
+      <h2>🔵 AZUL</h2>
+      <div class="units" id="units-vm1"></div>
+    </div>
+
+    <div class="team red">
+      <h2>🔴 ROJO</h2>
+      <div class="units" id="units-vm2"></div>
+    </div>
+  </div>
+
+  <!-- DONATIONS -->
+  <div id="feed"></div>
+
+  <!-- TOP DONATORS -->
+  <div id="top">
+    <h3>👑 TOP DONADORES</h3>
+    <ol id="top-list"></ol>
+  </div>
+
+  <script src="overlay.js"></script>
+</body>
+</html>
