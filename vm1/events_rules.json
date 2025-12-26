@@ -3,13 +3,13 @@
     "threshold": 20,
     "army": {
       "action": "barracks",
-      "unit": "g"
+      "unit": "s"
     }
   },
   "comment":{
     "arquero": {
       "action": "archery",
-      "unit": "c"
+      "unit": "a"
     }
   }
 }

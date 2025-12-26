@@ -16,32 +16,32 @@ BUILDINGS = {
 
 UNITS = {
     # barracks
-    "g": 'g',  # Milicia / Campeón
+    "s": 's',  # Campeon
+    "e": 'e',  # Albarero
     "r": 'r',  # Lancero
-    "e": 'e',  # Eagle
-    "s": 's',  # Espadachín (si aplica)
+    "g": 'g',  # Guerrero Elite
 
     # archery
-    "c": 'c',  # Arquero
     "a": 'a',  # Ballesta
-    "e_arch": 'e',
-    "r_arch": 'r',
+    "r_arch": 'r', #Guerrillero Elite
+    "c": 'c',  # Caballeria Arquero
+    "e_arch": 'e', #Artillero
 
     # stable
-    "t": 't',  # Scout
-    "c_cav": 'c',
-    "n": 'n',
+    "t": 't',  # Usar
+    "n": 'n', #Paladin
+    "c_cav": 'c', #Camello
 
     # siege
-    "r_siege": 'r',
-    "c_siege": 'c',
-    "a_siege": 'a',
-    "n_siege": 'n',
+    "r_siege": 'r', #Ariete
+    "a_siege": 'a', #Onagro
+    "n_siege": 'n', #Escorpion
+    "c_siege": 'c', #Cañon
 
     # castle
-    "r_castle": 'r',
-    "t_castle": 't',
-    "p_castle": 'p',
+    "t_castle": 't', 
+    "r_castle": 'r', #Lanza Piedras 
+    "p_castle": 'p', #Petardo
 }
 
 

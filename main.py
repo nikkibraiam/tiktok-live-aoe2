@@ -15,8 +15,8 @@ socketio = SocketIO(
 # ======================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def load_vms():
-    vms = {}
+def load_VMS():
+    VMS = {}
 
     for name in os.listdir(BASE_DIR):
         if name.startswith("vm") and os.path.isdir(name):
@@ -26,26 +26,27 @@ def load_vms():
             with open(f"{name}/events_rules.json", encoding="utf-8") as f:
                 rules = json.load(f)
 
-            vms[name] = {
+            VMS[name] = {
                 "gift_map": gift_map,
                 "rules": rules,
                 "like_buffer": 0
             }
 
-    return vms
+    print(VMS)
+    return VMS
 
-vmS = load_vms()
+VMS = load_VMS()
 LIKE_BUFFER = 0
 
 def resolve_vm_for_gift(gift):
-    for vm, data in vmS.items():
+    for vm, data in VMS.items():
         army = data["gift_map"].get(gift)
         if army:
             return vm, army
     return None, None
 
 def resolve_vm_for_event(event, key=None):
-    for vm, data in vmS.items():
+    for vm, data in VMS.items():
         rules = data["rules"].get(event)
         if not rules:
             continue
@@ -69,14 +70,20 @@ def resolve_vm_for_event(event, key=None):
 # ======================
 @socketio.on("register")
 def register(data):
-    vm = data.strip()
+    # data = {"bot": "vm1"}
+    vm = None
 
-    if vm not in vmS:
-        print(f"❌ vm inválido: {vm}")
+    if isinstance(data, dict):
+        vm = data.get("vm") or data.get("bot")
+    else:
+        vm = str(data).strip()
+
+    if not vm or vm not in VMS:
+        print(f"❌ vm inválido en register: {data}")
         return
 
-    join_room(vm)
     print(f"🤖 Bot registrado en {vm}")
+    join_room(vm)
 
 # ======================
 # TIKTOK EVENT
@@ -136,7 +143,7 @@ def like_event():
     data = request.json
     likes = data.get("likes", 0)
 
-    for vm, vm_data in vmS.items():
+    for vm, vm_data in VMS.items():
         rules = vm_data["rules"].get("likes")
         if not rules:
             continue
@@ -183,7 +190,7 @@ def share_event():
 
 
 def emit_simple_event(vm, event):
-    rules = vmS[vm]["rules"][event]
+    rules = VMS[vm]["rules"][event]
     socketio.emit("command", {
         "action": rules["army"]["action"],
         "unit": rules["army"]["unit"],

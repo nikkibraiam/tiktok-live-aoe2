@@ -2,19 +2,19 @@
   "comment": {
     "soldado": {
       "action": "barracks",
-      "unit": "g"
+      "unit": "s"
     }
   },
   "follow": {
     "army": {
       "action": "archery",
-      "unit": "c"
+      "unit": "a"
     }
   },
   "share": {
     "army": {
       "action": "archery",
-      "unit": "c"
+      "unit": "a"
     }
   }
 }
