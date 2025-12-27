@@ -3,6 +3,7 @@ const socket = io("http://localhost:5000");
 const giftMaps = {};
 const unitCounters = { vm1: {}, vm2: {} };
 let power = { vm1: 0, vm2: 0 };
+const avatarCache = {}; // user_id -> true | false
 const donors = {
   vm1: {}, // user -> total
   vm2: {}
@@ -21,9 +22,33 @@ async function loadGiftMaps() {
 
 loadGiftMaps();
 
+
 // --------------------
 // SOCKET EVENT
 // --------------------
+socket.on("avatar_ready", data => {
+  const { user_id, avatar } = data;
+
+  ["vm1", "vm2"].forEach(vm => {
+    const donor = donors[vm]?.[user_id];
+    if (!donor) return;
+
+    // ⛔ Ya tiene avatar real
+    if (!donor.avatar.includes("default_avatar")) return;
+
+    donor.avatar = avatar + "?t=" + Date.now();
+
+    const img = document.querySelector(
+      `img.avatar[data-user-id="${user_id}"]`
+    );
+
+    if (img) img.src = donor.avatar;
+
+    console.log("🖼️ Avatar actualizado:", user_id);
+  });
+});
+
+
 socket.on("overlay", data => {
   const {
     gift,
@@ -33,7 +58,7 @@ socket.on("overlay", data => {
     amount,
     diamonds = 1,
     user,
-    avatar
+    user_id
   } = data;
 
   let vm, action, unit;
@@ -60,28 +85,36 @@ socket.on("overlay", data => {
   // --------------------
   // DONOR
   // --------------------
-  if (!donors[vm][user]) {
-    donors[vm][user] = {
+  if (!donors[vm][user_id]) {
+    donors[vm][user_id] = {
+      id: user_id,
       name: user.slice(0, 20),
-      avatar: avatar || "overlay/default_avatar.png",
+      avatar: "overlay/default_avatar.png",
       total: 0,
       units: {}
     };
+
+    const donor = donors[vm][user_id];
+    const points = amount * diamonds;
+
+    donor.total += points;
+
+    const unitKey = `${action}_${unit}`;
+    donor.units[unitKey] = (donor.units[unitKey] || 0) + amount;
+
+    // --------------------
+    // POWER + TOP
+    // --------------------
+    updatePower(vm, points);
+    
+    checkAvatarExists(user_id).then(url => {
+      if(url){
+        donors[vm][user_id].avatar = url;
+      }
+      renderTop(vm);
+    });
   }
 
-  const donor = donors[vm][user];
-  const points = amount * diamonds;
-
-  donor.total += points;
-
-  const unitKey = `${action}_${unit}`;
-  donor.units[unitKey] = (donor.units[unitKey] || 0) + amount;
-
-  // --------------------
-  // POWER + TOP
-  // --------------------
-  updatePower(vm, points);
-  renderTop(vm);
 });
 
 
@@ -186,7 +219,7 @@ function renderTop(vm) {
       li.innerHTML = `
         <div class="rank">${rank}</div>
 
-        <img class="avatar" src="${donor.avatar}">
+        <img class="avatar" data-user-id="${donor.id}" src="${donor.avatar}">
 
         <div class="name">${donor.name}</div>
 
@@ -293,3 +326,31 @@ function formatNumberShort(num) {
   if (num >= 1e3)  return (num / 1e3).toFixed(1) + "K";
   return num.toString();
 }
+
+function checkAvatarExists(userId) {
+  if (avatarCache[userId] !== undefined) {
+    return Promise.resolve(
+      avatarCache[userId]
+        ? `/overlay/avatars/${userId}.jpeg`
+        : null
+    );
+  }
+
+  return new Promise(resolve => {
+    const img = new Image();
+    const url = `/overlay/avatars/${userId}.jpeg?t=${Date.now()}`;
+
+    img.onload = () => {
+      avatarCache[userId] = true;
+      resolve(url);
+    };
+
+    img.onerror = () => {
+      avatarCache[userId] = false;
+      resolve(null);
+    };
+
+    img.src = url;
+  });
+}
+

@@ -4,7 +4,7 @@ import httpx
 import asyncio
 import time
 
-TIKTOK_USER = "sarait20_"
+TIKTOK_USER = "alejandra_acevedo_"
 MAIN_API = "http://localhost:5000/"
 DEBOUNCE_SECONDS = 0.5
 
@@ -18,6 +18,34 @@ gift_buffer = {}
 like_buffer = {}
 
 debounce_started = False
+
+def avatar_url(user):
+    for field in [
+        "avatar_thumb",
+        "avatar_medium",
+        "avatar_large",
+        "avatar_jpg",
+        "profile_picture",
+        "avatar"
+    ]:
+        img = getattr(user, field, None)
+        if not img:
+            continue
+
+        # TikTokLive ImageModel variants
+        if hasattr(img, "url") and isinstance(img.url, str):
+            return img.url
+
+        if hasattr(img, "urls") and img.urls:
+            return img.urls[0]
+
+        if hasattr(img, "url_list") and img.url_list:
+            return img.url_list[0]
+
+        if isinstance(img, str):
+            return img
+
+    return ""
 
 
 @client.on(ConnectEvent)
@@ -38,11 +66,13 @@ async def on_gift(event: GiftEvent):
     if event.gift.streakable and is_streaking:
         return
 
+    print(vars(event.user))
     user = event.user.nickname
     user_id = event.user.unique_id
     gift = event.gift.name
     count = event.repeat_count or 1
-    avatar = event.user.avatar_url
+    avatar = avatar_url(event.user)
+    print("evento avatar: " + avatar)
     gift_value = event.gift.diamond_count
 
     key = (user_id, gift)
@@ -71,7 +101,8 @@ async def on_like(event: LikeEvent):
     user_id = event.user.unique_id
     user = event.user.nickname
     count = event.count  # likes enviados en ese evento
-    avatar = event.user.avatar_url
+    avatar = avatar_url(event.user)
+    print("evento avatar: " + avatar)
 
     if user_id not in like_buffer:
         like_buffer[user_id] = {
@@ -89,7 +120,8 @@ async def on_like(event: LikeEvent):
 @client.on(FollowEvent)
 async def on_follow(event: FollowEvent):
     print(f"➕ FOLLOW {event.user.nickname}")
-    avatar = event.user.avatar_url
+    avatar = avatar_url(event.user)
+    print("evento avatar: " + avatar)
 
     await httpx.AsyncClient().post(MAIN_API + "follow", json={
         "user": event.user.nickname,
@@ -102,7 +134,8 @@ async def on_follow(event: FollowEvent):
 async def on_share(event: ShareEvent):
     print(f"🔁 SHARE {event.user.nickname}")
 
-    avatar = event.user.avatar_url
+    avatar = avatar_url(event.user)
+    print("evento avatar: " + avatar)
 
     await httpx.AsyncClient().post(MAIN_API + "share", json={
         "user": event.user.nickname,
@@ -114,7 +147,8 @@ async def on_share(event: ShareEvent):
 @client.on(CommentEvent)
 async def on_comment(event: CommentEvent):
     print(f"💬 {event.user.nickname}: {event.comment}")
-    avatar = event.user.avatar_url
+    avatar = avatar_url(event.user)
+    print("evento avatar: " + avatar)
 
     await httpx.AsyncClient().post(MAIN_API + "comment", json={
         "user": event.user.nickname,
@@ -171,3 +205,4 @@ async def process_likes(http, to_send):
 if __name__ == "__main__":
     print("🎥 TikTok listener iniciado")
     client.run()
+

@@ -1,7 +1,9 @@
 from flask import Flask, request, send_from_directory
 from flask_socketio import SocketIO, join_room
+import threading
 import json
 import os
+from get_avatar import avatar_from_profile
 
 app = Flask(__name__)
 socketio = SocketIO(
@@ -60,6 +62,27 @@ def resolve_vm_for_event(event, key=None):
             return vm, rules
 
     return None, None
+
+
+def process_avatar_async(username):
+    try:
+        avatar_path = avatar_from_profile(username)
+        if not avatar_path:
+            return
+
+        # Ruta pública para el overlay
+        public_path = f"/overlay/avatars/{username}.jpeg"
+
+        socketio.emit("avatar_ready", {
+            "user": username,
+            "avatar": public_path
+        })
+
+        print(f"🖼️ Avatar listo → {username}")
+
+    except Exception as e:
+        print(f"❌ Error avatar {username}: {e}")
+
 
 @app.after_request
 def no_cache(resp):
@@ -122,18 +145,10 @@ def register(data):
 def gift_event():
     data = request.json
     user = data["user"]
+    user_id = data.get("userId")
     gift = data["gift"]
     amount = data.get("amount", 1)
-    avatar = data.get("avatar")
     diamonds = data.get("diamonds")
-
-    socketio.emit("overlay", {
-        "user": user,
-        "gift": gift,
-        "amount": amount,
-        "avatar": avatar,
-        "diamonds": diamonds,
-    })
 
     vm, army = resolve_vm_for_gift(gift)
 
@@ -147,6 +162,19 @@ def gift_event():
         "amount": amount
     }, room=vm)
 
+    threading.Thread(
+        target=process_avatar_async,
+        args=(user_id,),
+        daemon=True
+    ).start()
+
+    socketio.emit("overlay", {
+        "user": user,
+        "gift": gift,
+        "amount": amount,
+        "diamonds": diamonds,
+    })
+
     print(f"⚔️ {vm} | {user} → {army['action']} {army['unit']} x{amount}")
     return {"ok": True}
 
@@ -155,8 +183,8 @@ def gift_event():
 def comment_event():
     data = request.json
     user = data["user"]
+    user_id = data.get("userId")
     comment = data.get("message", "").lower()
-    avatar = data.get("avatar")
 
     vm, rule = resolve_vm_for_event("comment", comment)
 
@@ -169,11 +197,17 @@ def comment_event():
         "amount": 1
     }, room=vm)
 
+    threading.Thread(
+        target=process_avatar_async,
+        args=(user_id,),
+        daemon=True
+    ).start()
+
     socketio.emit("overlay", {
         "type": "comment",
         "vm": vm,
         "user": user,
-        "avatar": avatar,
+        "user_id": user_id,
         "diamonds": 1,
         "action": rule["action"],
         "unit": rule["unit"],
@@ -190,7 +224,7 @@ def like_event():
     data = request.json
     likes = data.get("likes", 0)
     user = data["user"]
-    avatar = data.get("avatar")
+    user_id = data.get("userId")
 
     for vm, vm_data in VMS.items():
         rules = vm_data["rules"].get("likes")
@@ -218,11 +252,17 @@ def like_event():
                 "amount": spawned
             }, room=vm)
 
+            threading.Thread(
+                target=process_avatar_async,
+                args=(user_id,),
+                daemon=True
+            ).start()
+
             # Overlay (consume likes correctamente)
             socketio.emit("overlay", {
                 "vm": vm,
                 "user": user,
-                "avatar": avatar,
+                "user_id": user_id,
                 "action": rules["army"]["action"],
                 "unit": rules["army"]["unit"],
                 "diamonds": 1,
@@ -241,18 +281,24 @@ def follow_event():
     vm, rules = resolve_vm_for_event("follow")
 
     data = request.json
-    avatar = data.get("avatar")
+    user_id = data.get("userId")
     user = data.get("user")
     if not vm:
         return {"ok": True}
 
     emit_simple_event(vm, "follow")
 
+    threading.Thread(
+        target=process_avatar_async,
+        args=(user_id,),
+        daemon=True
+    ).start()
+
     socketio.emit("overlay", {
         "type": "follow",
         "vm": vm,
         "user": user,
-        "avatar": avatar,
+        "user_id": user_id,
         "action": rules["army"]["action"],
         "unit": rules["army"]["unit"],
         "diamonds":1,
@@ -270,18 +316,24 @@ def share_event():
 
     data = request.json
     user = data.get("user")
-    avatar = data.get("avatar")
+    user_id = data.get("userId")
 
     if not vm:
         return {"ok": True}
 
     emit_simple_event(vm, "share")
 
+    threading.Thread(
+        target=process_avatar_async,
+        args=(user_id,),
+        daemon=True
+    ).start()
+
     socketio.emit("overlay", {
         "type": "share",
         "vm": vm,
         "user": user,
-        "avatar": avatar,
+        "user_id": user_id,
         "action": rules["army"]["action"],
         "unit": rules["army"]["unit"],
         "diamonds":1,
