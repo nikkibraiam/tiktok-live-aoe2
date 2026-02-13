@@ -38,8 +38,6 @@ def download_avatar(url: str, save_path: str):
 def avatar_from_profile(username: str) -> str:
 
     user_dir = os.path.join(BASE_AVATAR_DIR, username)
-    os.makedirs(user_dir, exist_ok=True)
-
     avatar_path = user_dir + ".jpeg"
 
     # Evita descargar si ya existe

@@ -93,6 +93,7 @@ socket.on("overlay", data => {
       total: 0,
       units: {}
     };
+  }
 
     const donor = donors[vm][user_id];
     const points = amount * diamonds;
@@ -113,8 +114,6 @@ socket.on("overlay", data => {
       }
       renderTop(vm);
     });
-  }
-
 });
 
 

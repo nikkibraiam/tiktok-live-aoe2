@@ -1,6 +1,5 @@
 from flask import Flask, request, send_from_directory
 from flask_socketio import SocketIO, join_room
-import threading
 import json
 import os
 from get_avatar import avatar_from_profile
@@ -8,7 +7,8 @@ from get_avatar import avatar_from_profile
 app = Flask(__name__)
 socketio = SocketIO(
     app,
-    cors_allowed_origins="*"
+    cors_allowed_origins="*",
+    async_mode="threading"
 )
 
 # ======================
@@ -74,7 +74,7 @@ def process_avatar_async(username):
         public_path = f"/overlay/avatars/{username}.jpeg"
 
         socketio.emit("avatar_ready", {
-            "user": username,
+            "user_id": username,
             "avatar": public_path
         })
 
@@ -162,14 +162,14 @@ def gift_event():
         "amount": amount
     }, room=vm)
 
-    threading.Thread(
-        target=process_avatar_async,
-        args=(user_id,),
-        daemon=True
-    ).start()
+    socketio.start_background_task(
+        process_avatar_async,
+        user_id
+    )
 
     socketio.emit("overlay", {
         "user": user,
+        "user_id": user_id,
         "gift": gift,
         "amount": amount,
         "diamonds": diamonds,
@@ -197,11 +197,10 @@ def comment_event():
         "amount": 1
     }, room=vm)
 
-    threading.Thread(
-        target=process_avatar_async,
-        args=(user_id,),
-        daemon=True
-    ).start()
+    socketio.start_background_task(
+        process_avatar_async,
+        user_id
+    )
 
     socketio.emit("overlay", {
         "type": "comment",
@@ -252,11 +251,10 @@ def like_event():
                 "amount": spawned
             }, room=vm)
 
-            threading.Thread(
-                target=process_avatar_async,
-                args=(user_id,),
-                daemon=True
-            ).start()
+            socketio.start_background_task(
+                process_avatar_async,
+                user_id
+            )
 
             # Overlay (consume likes correctamente)
             socketio.emit("overlay", {
@@ -288,11 +286,10 @@ def follow_event():
 
     emit_simple_event(vm, "follow")
 
-    threading.Thread(
-        target=process_avatar_async,
-        args=(user_id,),
-        daemon=True
-    ).start()
+    socketio.start_background_task(
+        process_avatar_async,
+        user_id
+    )   
 
     socketio.emit("overlay", {
         "type": "follow",
@@ -323,11 +320,10 @@ def share_event():
 
     emit_simple_event(vm, "share")
 
-    threading.Thread(
-        target=process_avatar_async,
-        args=(user_id,),
-        daemon=True
-    ).start()
+    socketio.start_background_task(
+        process_avatar_async,
+        user_id
+    )
 
     socketio.emit("overlay", {
         "type": "share",

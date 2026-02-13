@@ -65,19 +65,20 @@ ol{
 /* TEAMS */
 #teams {
   position: fixed;
-  top: 25px;
+  top: 255px;
   left: 0;
   right: 0;
   display: flex;
   justify-content: space-between;
   pointer-events: none; /* opcional, OBS-friendly */
+  height: 500px;
 }
 
 .team {
     background: #0000008c;
     padding: 5px;
     border-radius: 14px;
-    width: 330px;
+    width: 455px;
     font-size: 18px;
     pointer-events: auto;
     margin: 5px;
@@ -171,18 +172,18 @@ ol{
 
 .top-player {
     display: grid;
-    grid-template-columns: 45px 52px 1fr 75px;
+    grid-template-columns: 68px 85px 1fr 82px;
     align-items: center;
     gap: 2px;
     padding: 2px;
-    font-size: 25px;
+    font-size: 28px;
     margin-top: 5px;
 
 }
 
 .top-player .avatar {
-  width: 50px;
-  height: 50px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
 }
 
@@ -190,7 +191,7 @@ ol{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 28px;
+  font-size: 35px;
 }
 
 .top-player .units {
@@ -209,9 +210,9 @@ ol{
   text-align: center;
 }
 
-.rank{
-  font-size: 35px;
-  height: 50px;
+.rank {
+    font-size: 55px;
+    height: 80px;
 }
 
 #bottom-overlay {
@@ -222,7 +223,7 @@ ol{
 
 /* INFO BAR */
 #info-bar {
-  background: rgba(0,0,0,0.48);
+  background: black;
   display: flex;
   justify-content: space-around;
   font-size: 12px;
@@ -241,8 +242,8 @@ ol{
 
 .info-unit {
     position: relative;
-    width: 145px;
-    height: 140px;
+    width: 140px;
+    height: 135px;
     background: rgba(0,0,0,0.55);
     border-radius: 12px;
     display: flex;
@@ -252,8 +253,8 @@ ol{
 
 /* UNIDAD GRANDE */
 .info-unit .unit-img {
-    width: 140px;
-    height: 135px;
+    width: 135px;
+    height: 130px;
     z-index: 1;
     border-radius: 5px;
 }
@@ -274,11 +275,11 @@ ol{
 
 /* COLOR TEAM */
 .info-team.blue{
-    background: #1200ff26;
+    background: #1200ff61;
 }
 
 .info-team.red{
-    background: #ff000026;
+    background: #ff0000b2;
 }
 
 .info-team.blue .info-unit {
