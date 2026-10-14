@@ -1,9 +1,10 @@
-from TikTokLive import TikTokLiveClient
-from TikTokLive.events import ConnectEvent, GiftEvent, LikeEvent, FollowEvent, CommentEvent, ShareEvent
-import httpx
 import asyncio
 import os
 import time
+
+import httpx
+from TikTokLive import TikTokLiveClient
+from TikTokLive.events import CommentEvent, ConnectEvent, FollowEvent, GiftEvent, LikeEvent, ShareEvent
 
 TIKTOK_USER = os.getenv("TIKTOK_USER", "nikkibraiam7")
 MAIN_API = os.getenv("AOE_SERVER_URL", "http://localhost:5000").rstrip("/") + "/"
@@ -139,7 +140,7 @@ async def process_gifts(http, to_send):
     for key, data in to_send:
         await http.post(MAIN_API + "gift", json={
             "user": data["user"],
-            "userId": key,
+            "userId": data["user_id"],
             "gift": data["gift"],
             "amount": data["count"],
             "diamonds": data.get("diamonds", 0)

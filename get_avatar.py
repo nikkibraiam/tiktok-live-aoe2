@@ -1,7 +1,8 @@
-import httpx
 import json
-import re
 import os
+import re
+
+import httpx
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
