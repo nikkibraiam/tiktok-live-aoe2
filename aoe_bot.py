@@ -1,3 +1,4 @@
+import os
 import time
 import socketio
 from pynput.keyboard import Controller, Key
@@ -48,8 +49,8 @@ UNITS = {
 # =========================
 # CONFIG
 # =========================
-SERVER_URL = "http://192.168.17.1:5000"  # cambia esto
-BOT_NAME = "vm1"  # vm1 / vm2 etc
+SERVER_URL = os.getenv("AOE_SERVER_URL", "http://localhost:5000")
+BOT_NAME = os.getenv("AOE_BOT_NAME", "vm1")  # vm1 / vm2 etc
 
 kb = Controller()
 sio = socketio.Client()

@@ -8,6 +8,7 @@ HEADERS = {
 }
 
 BASE_AVATAR_DIR = "overlay/avatars"
+os.makedirs(BASE_AVATAR_DIR, exist_ok=True)
 
 
 def fetch_profile_html(username: str) -> str:
