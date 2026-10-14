@@ -1,0 +1,12 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["overlay"]
+
+[tool.ruff.lint]
+# Pyflakes + import sorting: real bugs, not style churn on the original code.
+select = ["F", "I"]

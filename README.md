@@ -1,5 +1,7 @@
 # TikTok Live × Age of Empires II
 
+[![CI](https://github.com/nikkibraiam/tiktok-live-aoe2/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/nikkibraiam/tiktok-live-aoe2/actions/workflows/ci.yml)
+
 Turn a TikTok Live stream into an Age of Empires II battle: every gift, like or
 comment from viewers trains real units inside two running AoE2 matches, and an
 on-stream overlay shows who sent what.
@@ -64,6 +66,15 @@ python tiktok_listener.py    # while the stream is live
 AOE_SERVER_URL=http://<host-ip>:5000 AOE_BOT_NAME=vm1 python aoe_bot.py
 ```
 
+## Tests
+
+```bash
+pip install -r requirements.txt -r requirements-dev.txt
+pytest
+```
+
+The hub is tested end to end with Flask-SocketIO's test client: gift routing to the right side, unknown gifts, per-user like thresholds and comment keywords. The listener tests cover streak handling, merging of repeated gifts and the payload sent to the hub. The keyboard bot is not tested: it needs a running game.
+
 ## Design notes
 
 - **Debounce instead of per-event calls**: TikTok emits one event per gift in
@@ -74,6 +85,6 @@ AOE_SERVER_URL=http://<host-ip>:5000 AOE_BOT_NAME=vm1 python aoe_bot.py
 - **Keyboard automation over memory hacking**: the bot only uses the game's
   own hotkeys, so it works with an unmodified client.
 
-Unit icons in `images/` belong to their respective owners (Age of Empires II:
+Licensed under MIT. Unit icons in `images/` belong to their respective owners (Age of Empires II:
 Definitive Edition, Microsoft / World's Edge) and are used for a
 non-commercial fan project.
