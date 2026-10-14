@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      # pynput (game bot) needs an X server and is not exercised by the tests.
+      - run: pip install flask flask-socketio "python-socketio[client]" TikTokLive httpx -r requirements-dev.txt
+      - run: ruff check .
+      - run: pytest -v

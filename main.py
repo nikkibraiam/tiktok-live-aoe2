@@ -1,7 +1,9 @@
-from flask import Flask, request, send_from_directory
-from flask_socketio import SocketIO, join_room
 import json
 import os
+
+from flask import Flask, request, send_from_directory
+from flask_socketio import SocketIO, join_room
+
 from get_avatar import avatar_from_profile
 
 app = Flask(__name__)
@@ -20,11 +22,12 @@ def load_VMS():
     VMS = {}
 
     for name in os.listdir(BASE_DIR):
-        if name.startswith("vm") and os.path.isdir(name):
-            with open(f"{name}/gift_map.json", encoding="utf-8") as f:
+        vm_dir = os.path.join(BASE_DIR, name)
+        if name.startswith("vm") and os.path.isdir(vm_dir):
+            with open(os.path.join(vm_dir, "gift_map.json"), encoding="utf-8") as f:
                 gift_map = {g["gift"]: g["army"] for g in json.load(f)}
 
-            with open(f"{name}/events_rules.json", encoding="utf-8") as f:
+            with open(os.path.join(vm_dir, "events_rules.json"), encoding="utf-8") as f:
                 rules = json.load(f)
 
             VMS[name] = {
