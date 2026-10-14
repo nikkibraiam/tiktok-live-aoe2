@@ -2,10 +2,11 @@ from TikTokLive import TikTokLiveClient
 from TikTokLive.events import ConnectEvent, GiftEvent, LikeEvent, FollowEvent, CommentEvent, ShareEvent
 import httpx
 import asyncio
+import os
 import time
 
-TIKTOK_USER = "nikkibraiam7"
-MAIN_API = "http://localhost:5000/"
+TIKTOK_USER = os.getenv("TIKTOK_USER", "nikkibraiam7")
+MAIN_API = os.getenv("AOE_SERVER_URL", "http://localhost:5000").rstrip("/") + "/"
 DEBOUNCE_SECONDS = 0.5
 
 client = TikTokLiveClient(unique_id=TIKTOK_USER)
